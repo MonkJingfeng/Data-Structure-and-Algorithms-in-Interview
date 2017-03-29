@@ -105,6 +105,111 @@ List insertNode(List head, int num, int pos) {
     return head;
 }
 
+// @brief   Reverse a %list
+//
+// @param   head    A %list
+List reverseList(List head) {
+    List p = head->next; List pre = NULL;
+    while (p != NULL) {
+        Node* pNxt = p->next; // 保存下一个节点的值
+        p->next = pre; // 把当前Node的下一个节点指向Pre
+        pre = p; // 此时Pre向后移动指向此时的Node
+        p = pNxt; // 而Node也向后移动，指向刚才保存的Next...Notice : 这里写成p = p->next 是错的
+    }
+    List ret = creatList(0); // 表头
+    ret->next = pre;
+    return ret;
+}
+
+// @brief    Reverse a %list in [m, n]
+List reverseBetween(List head, int m, int n) {
+    if (head == NULL || m > n)
+        return NULL;
+    Node* dummyNode = new Node(); // 便于操作
+    dummyNode->next = head;
+    Node* pPrev = head;
+    for (int i=1; i<m; i++) // pPrev指向待翻转区间的前一个节点
+        if (pPrev)
+            pPrev = pPrev->next;
+    if (pPrev != NULL) { // 链表长度>=m
+        Node* pLast = pPrev->next; // pLast指向待翻转区间的第一个节点
+        List p = pPrev->next; List pre = NULL;
+        while (p != NULL) {
+            Node* pNxt = p->next; // 保存下一个节点的值
+            p->next = pre; // 把当前Node的下一个节点指向Pre
+            pre = p; // 此时Pre向后移动指向此时的Node
+            p = pNxt; // 而Node也向后移动，指向刚才保存的Next...Notice : 这里写成p = p->next 是错的
+        }
+        pLast->next = p; // 拼接
+        pPrev->next = pre;
+    }
+    return dummyNode->next;
+}
+
+List getFirstNodeInCircle(List head) {
+    if (head == NULL || head->next == NULL) {
+        return NULL;
+    }
+    List pFast = head, pSlow = head;
+    while (pFast != NULL && pFast->next != NULL) {
+        pSlow = pSlow->next;
+        pFast = pFast->next->next;
+        if (pFast == pSlow) {
+            break;
+        }
+    }
+    if (pFast == NULL || pFast->next == NULL) { // 判定无环
+        return NULL;
+    }
+    List pTail = pFast; // 假设此点为尾结点， 从此断开展成一个新的链表
+    
+    List pHead1 = head, pHead2 = pTail->next;
+    int len1 = 1, len2 = 1;
+    for (List i=pHead1; i!=pTail; i=i->next)
+        len1++;
+    for (List i=pHead2; i!=pTail; i=i->next)
+        len2++;
+    // 先对齐两个链表
+    List pNode1 = pHead1, pNode2 = pHead2;
+    for (int i=len2; i<len1; i++)
+        pNode1 = pNode1->next;
+    for (int i=len1; i<len2; i++)
+        pNode2 = pNode2->next;
+    // 遍历寻找交点
+    for(; pNode2 != pNode1 && pNode1 != pTail; pNode1 = pNode1->next, pNode2 = pNode2->next)
+        ;
+    return pNode2;
+}
+
+void DeleteNode(LisNode** pListHead, ListNode* pToDeleted) {
+    if(!pListHead || !pToBeDeleted) {
+        return;
+    }
+    
+    if(pToBeDeleted->m_pNext != NULL) {
+        ListNode* pNext = pToBeDeleted->m_pNext;
+        pToBeDeleted->m_nValue = pNext->m_nValue;
+        pToBeDeleted->m_pNext = pNext->m_pNext;
+        
+        delete pNext;
+        pNext = NULL;
+    } else if(*pListHead == pToBeDeleted) {
+        delete pToBeDeleted;
+        pToBeDeleted = NULL;
+        *pListHead = NULL;
+    } else {
+        ListNode* pNode = *pListHead;
+        while(pNode->m_pNext != pToBeDeleted) {
+            pNode = pNode->m_pNext;
+        }
+        
+        pNode->m_pNext = NULL;
+        delete pToBeDeleted;
+        pToBeDeleted = NULL;
+    }
+}
+
+
 // @brief    Print a %list one by one
 //
 // @param    L    A %list
@@ -120,16 +225,15 @@ void printList(List L) {
     printf("\n");
 }
 
-
 int main() {
     int n;
     List L;
     
     scanf("%d",&n);
     L = creatList(n);
-    printList(L);
     //removeNode(L, 3);
-    insertNode(L, 3, 5);
+    insertNode(L, 3, 1);printList(L);
+    L = reverseList(L);
     printList(L);
     
     return 0;
