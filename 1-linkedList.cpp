@@ -180,7 +180,7 @@ List getFirstNodeInCircle(List head) {
         ;
     return pNode2;
 }
-
+/*
 void DeleteNode(LisNode** pListHead, ListNode* pToDeleted) {
     if(!pListHead || !pToBeDeleted) {
         return;
@@ -207,8 +207,74 @@ void DeleteNode(LisNode** pListHead, ListNode* pToDeleted) {
         delete pToBeDeleted;
         pToBeDeleted = NULL;
     }
+}*/
+
+void Quicksort(List &head, List &end){
+    List head1, head2, end1, end2;  // 记录分割后前后两个链表的头尾节点
+    head1 = head2 = end1 = end2  = NULL;
+    
+    if (NULL == head) return;  // 如果当前节点为空，返回
+    
+    List p, pre1, pre2;  // 用于遍历链表将链表中的元素分成大于key和小于key两个部分
+    p = pre1 = pre2 = NULL;
+    
+    int key = head->data;
+    p = head->next; head->next = NULL;    // 取头结点的值作为分界线
+    while (p != NULL) {
+        if (p->data < key) { // 小于key的链表
+            if (!head1) {
+                head1 = pre1 = p;
+            } else {
+                pre1 = pre1->next = p;
+            }
+        } else { // 大于等于key的链表
+            if (!head2) {
+                head2 = pre2 = p;
+            } else {
+                pre2 = pre2->next = p;
+            }
+        }
+        p = p->next;
+    }
+    
+    if (pre1) pre1->next = NULL;
+    if (pre2) pre2->next = NULL;
+    
+    end1 = pre1; end2 = pre2;   // 给新链表赋尾节点
+    
+    // 对左右两个链表进行递归快排
+    Quicksort(head1, end1);
+    Quicksort(head2, end2);
+    
+    // 将key节点和左右两个链表连起来
+    if (end1 && head2) { // 左右链表都存在
+        end1->next = head;
+        head->next = head2;
+        head = head1;
+        end = end2;
+    } else if (end1) { // 只有左链表
+        end1->next = head;
+        end = head;
+        head = head1;
+    } else if (head2) {  // 只有右链表
+        head->next = head2;
+        end = end2;
+    }
 }
 
+int getRandom(List head) {
+    List p = head->next;
+    int ret = p->data;
+    int n = 2;
+    p = p->next;
+    while (p) {
+        if (rand() % n == 0)
+            ret = p->data;
+        ++n;
+        p = p->next;
+    }
+    return ret;
+}
 
 // @brief    Print a %list one by one
 //
@@ -231,10 +297,23 @@ int main() {
     
     scanf("%d",&n);
     L = creatList(n);
-    //removeNode(L, 3);
-    insertNode(L, 3, 1);printList(L);
-    L = reverseList(L);
-    printList(L);
+    // removeNode(L, 3);
+    
+    // insertNode(L, 3, 1);
+    
+    // L = reverseList(L);
+    
+    /*List tail;
+    for (tail=L; tail->next; tail=tail->next)
+        ;
+    Quicksort(L, tail);*/
+    
+    /*srand(time(NULL));
+    int cnt[4]={0};
+    for (int i=0; i<10000; i++) {int tmp=getRandom(L); cnt[tmp]++;}
+    printf("%d %d %d\n", cnt[1], cnt[2], cnt[3]);*/
+    
+    //printList(L);
     
     return 0;
 }
